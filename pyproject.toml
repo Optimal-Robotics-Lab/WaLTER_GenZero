@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "walter-genzero" # This is the name of the pip package
+version = "0.0.1"
+requires-python = ">=3.12"
+
+[tool.setuptools]
+packages = [
+    "walter_genzero",
+    "walter_genzero.controllers",
+    "walter_genzero.lib",
+]
