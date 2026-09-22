@@ -7,9 +7,7 @@ name = "walter-genzero" # This is the name of the pip package
 version = "0.0.1"
 requires-python = ">=3.12"
 
-[tool.setuptools]
-packages = [
-    "walter_genzero",
-    "walter_genzero.controllers",
-    "walter_genzero.lib",
-]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["walter_genzero*"]
+namespaces = false
