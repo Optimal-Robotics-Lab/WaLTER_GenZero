@@ -52,8 +52,8 @@ class MotorModel:
   # Position control function that limits torque according to speed torque curve
   def pos_control(self, target_pos: float):
     self.target_pos = target_pos
-    q = self.d.jnt(self.motor_name).qpos
-    qdot = self.d.jnt(self.motor_name).qvel
+    q = self.d.jnt(self.motor_name).qpos[0]
+    qdot = self.d.jnt(self.motor_name).qvel[0]
     tau = self.Kp*(self.target_pos - q) - self.Kd*qdot
     self.target_torque = tau
     self.limited_torque = self.speed_torque_limit(tau)
@@ -63,7 +63,7 @@ class MotorModel:
   # Velocity control function that limits torque according to speed torque curve
   def vel_control(self, target_vel: float):
     self.target_vel = target_vel
-    qdot = self.d.jnt(self.motor_name).qvel
+    qdot = self.d.jnt(self.motor_name).qvel[0]
     tau = self.Kp*(self.target_vel - qdot) #+ self.Kd*(-self.d.jnt(self.motor_name).qacc)
     self.target_torque = tau
     self.limited_torque = self.speed_torque_limit(tau)
@@ -80,7 +80,7 @@ class MotorModel:
 
   # Function that returns the limited torque according to the speed torque curve
   def speed_torque_limit(self, target_torque: float):
-    w_motor = abs(self.d.jnt(self.motor_name).qvel)*self.gear_ratio
+    w_motor = abs(self.d.jnt(self.motor_name).qvel[0])*self.gear_ratio
     self.tau_max = -(self.t_stall/self.w_no_load)*w_motor + self.t_stall
 
     # If target torque is greater than speed/torque curve allows, limit it

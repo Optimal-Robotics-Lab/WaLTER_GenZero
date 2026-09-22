@@ -6,15 +6,14 @@ import yaml
 from pathlib import Path
 import os
 import sys
-from walter_genzero.lib.MotorModel import MotorModel as motor
-from walter_genzero.controllers.JoystickControl import JoystickController as js_ctrl
-from modeling.WaLTER_Modeling import ModelGenerator
-from walter_genzero.lib.Sender import DataSender as sender
+from walter_genzero.lib import MotorModel as motor
+from walter_genzero.controllers import JoystickControl as js_ctrl
+from WaLTER_Modeling import ModelGenerator
 
 
 # Call AutoSim to generate the new robot spec:
-model_config_path = 'model_configs/WS_Scale/model_config.yaml'
-motor_config_path = 'model_configs/WS_Scale/motor_config.yaml'
+model_config_path = 'modeling/WaLTER_Modeling/parametric_configs/FS/model_config.yaml'
+motor_config_path = 'modeling/WaLTER_Modeling/parametric_configs/FS/motor_config.yaml'
 
 # Load motor params for later access
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
@@ -66,8 +65,6 @@ motors_to_plot = [br_hip, br_knee, br_wheel1_joint]
 # Initialize joystick controller
 controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
-# Initialize data sender
-data_sender = sender.DataSender()
 
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
@@ -83,25 +80,9 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
         motors_to_plot = motor.log_motor_data_output(motors_to_plot)
 
-        # Put together data struct for plotter:
-        sim_time = time.time()-start
-        data = {
-            'time': sim_time,
-            # 'motor1_data': abs_vel
-            'motor1_torque': motors_to_plot[0].torques[-1],
-            'motor1_speed': motors_to_plot[0].omegas[-1],
-            'motor2_torque': motors_to_plot[1].torques[-1],
-            'motor2_speed': motors_to_plot[1].omegas[-1],
-            'motor3_torque': motors_to_plot[2].torques[-1],
-            'motor3_speed': motors_to_plot[2].omegas[-1],
-        }
-
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
-
-        # Send data to the plotter
-        data_sender.send_data(sim_time, data)
 
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
@@ -113,6 +94,3 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
 
-# br_wheel1_joint.plot_data_output_rpms()
-# br_knee.plot_data_output_rpms()
-# br_hip.plot_data_output_rpms()
